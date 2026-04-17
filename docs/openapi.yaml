@@ -1,0 +1,2030 @@
+openapi: 3.0.0
+info:
+  title: Voting Platform API
+  version: 1.0.0
+  description: Multi-tenant election and voting system with role-based access control
+  contact:
+    name: Development Team
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+  - url: https://api.voting-platform.com/api
+    description: Production server
+
+components:
+  securitySchemes:
+    sanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Sanctum API token for authenticated users
+
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: X-Voter-Token
+      description: Voter token for anonymous/public voting
+
+  schemas:
+    # ==================== Auth Schemas ====================
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - password_confirmation
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          example: securepassword123
+        password_confirmation:
+          type: string
+          format: password
+          example: securepassword123
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        main_role:
+          type: string
+          enum: [admin, user]
+          example: user
+        email_verified_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    PasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - email
+        - token
+        - password
+        - password_confirmation
+      properties:
+        email:
+          type: string
+          format: email
+        token:
+          type: string
+        password:
+          type: string
+          format: password
+        password_confirmation:
+          type: string
+          format: password
+
+    ChangePasswordRequest:
+      type: object
+      required:
+        - current_password
+        - password
+        - password_confirmation
+      properties:
+        current_password:
+          type: string
+          format: password
+        password:
+          type: string
+          format: password
+        password_confirmation:
+          type: string
+          format: password
+
+    # ==================== Organization Schemas ====================
+    CreateOrganizationRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Board of Directors
+        slug:
+          type: string
+          example: board-of-directors
+
+    UpdateOrganizationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Board of Directors
+        slug:
+          type: string
+          example: board-of-directors
+
+    Organization:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        owner_id:
+          type: integer
+        role:
+          type: string
+          enum: [owner, admin, member, viewer]
+          description: Current user's role in this organization
+        members_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # ==================== Member Schemas ====================
+    CreateMemberRequest:
+      type: object
+      required:
+        - user_id
+        - role
+      properties:
+        user_id:
+          type: integer
+          example: 5
+        role:
+          type: string
+          enum: [admin, member, viewer]
+          example: member
+
+    UpdateMemberRoleRequest:
+      type: object
+      required:
+        - role
+      properties:
+        role:
+          type: string
+          enum: [admin, member, viewer]
+          example: admin
+
+    InviteMemberRequest:
+      type: object
+      required:
+        - email
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          example: invitee@example.com
+        role:
+          type: string
+          enum: [admin, member, viewer]
+          example: member
+
+    OrganizationMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          $ref: '#/components/schemas/User'
+        role:
+          type: string
+          enum: [owner, admin, member, viewer]
+        status:
+          type: string
+          enum: [active, pending]
+        created_at:
+          type: string
+          format: date-time
+
+    Invite:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        token:
+          type: string
+        role:
+          type: string
+          enum: [admin, member, viewer]
+        status:
+          type: string
+          enum: [pending, accepted]
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    # ==================== Election Schemas ====================
+    CreateElectionRequest:
+      type: object
+      required:
+        - title
+        - type
+        - start_date
+        - end_date
+      properties:
+        title:
+          type: string
+          example: 2025 Board Elections
+        description:
+          type: string
+          example: Annual board member elections
+        type:
+          type: string
+          enum: [public, private]
+          example: private
+        start_date:
+          type: string
+          format: date-time
+          example: 2025-04-15T10:00:00Z
+        end_date:
+          type: string
+          format: date-time
+          example: 2025-04-15T17:00:00Z
+
+    UpdateElectionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+
+    Election:
+      type: object
+      properties:
+        id:
+          type: integer
+        organization_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [public, private]
+        status:
+          type: string
+          enum: [draft, active, stopped, closed, published]
+        start_date:
+          type: string
+          format: date-time
+          nullable: true
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        access_token:
+          type: string
+          nullable: true
+          description: Token for private election participation
+        positions_count:
+          type: integer
+        created_by:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ElectionDetail:
+      allOf:
+        - $ref: '#/components/schemas/Election'
+        - type: object
+          properties:
+            positions:
+              type: array
+              items:
+                $ref: '#/components/schemas/PositionWithCandidates'
+
+    # ==================== Position Schemas ====================
+    CreatePositionRequest:
+      type: object
+      required:
+        - title
+        - max_votes
+      properties:
+        title:
+          type: string
+          example: President
+        description:
+          type: string
+          example: Chief executive officer
+        max_votes:
+          type: integer
+          minimum: 1
+          example: 1
+
+    UpdatePositionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        max_votes:
+          type: integer
+          minimum: 1
+
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+        election_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        max_votes:
+          type: integer
+        candidates_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    PositionWithCandidates:
+      allOf:
+        - $ref: '#/components/schemas/Position'
+        - type: object
+          properties:
+            candidates:
+              type: array
+              items:
+                $ref: '#/components/schemas/Candidate'
+
+    # ==================== Candidate Schemas ====================
+    CreateCandidateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Alice Johnson
+        bio:
+          type: string
+          example: 10 years of experience in leadership
+        avatar:
+          type: string
+          format: uri
+          example: https://example.com/avatars/alice.jpg
+
+    UpdateCandidateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        avatar:
+          type: string
+          format: uri
+
+    Candidate:
+      type: object
+      properties:
+        id:
+          type: integer
+        position_id:
+          type: integer
+        name:
+          type: string
+        bio:
+          type: string
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        votes_count:
+          type: integer
+          description: Vote count (only in results view)
+        created_at:
+          type: string
+          format: date-time
+
+    # ==================== Election Access Schemas ====================
+    CreateElectionAccessRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: If providing user_id instead of email for registered users
+        email:
+          type: string
+          format: email
+          description: Email for sending access token
+
+    BulkElectionAccessRequest:
+      type: object
+      required:
+        - voters
+      properties:
+        voters:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              user_id:
+                type: integer
+
+    ElectionAccess:
+      type: object
+      properties:
+        id:
+          type: integer
+        election_id:
+          type: integer
+        user_id:
+          type: integer
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        token:
+          type: string
+        status:
+          type: string
+          enum: [active, used]
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        used_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    # ==================== Voting Schemas ====================
+    VoteRequest:
+      type: object
+      required:
+        - organization_id
+        - election_id
+        - token
+        - votes
+      properties:
+        organization_id:
+          type: integer
+          example: 1
+        election_id:
+          type: integer
+          example: 10
+        token:
+          type: string
+          description: Voter access token (for private elections)
+          example: voter_abc123def
+        votes:
+          type: array
+          items:
+            type: object
+            required:
+              - position_id
+              - candidate_id
+            properties:
+              position_id:
+                type: integer
+                example: 1
+              candidate_id:
+                type: integer
+                example: 11
+
+    VoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        vote_session_id:
+          type: integer
+        votes_count:
+          type: integer
+
+    VoteReceipt:
+      type: object
+      properties:
+        id:
+          type: integer
+        election_id:
+          type: integer
+        election_title:
+          type: string
+        votes_count:
+          type: integer
+        submitted_at:
+          type: string
+          format: date-time
+
+    # ==================== Results Schemas ====================
+    CandidateResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        votes:
+          type: integer
+        percentage:
+          type: number
+          format: double
+          example: 45.5
+
+    PositionResult:
+      type: object
+      properties:
+        position_id:
+          type: integer
+        title:
+          type: string
+        max_votes:
+          type: integer
+        total_votes:
+          type: integer
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateResult'
+
+    ElectionResults:
+      type: object
+      properties:
+        election_id:
+          type: integer
+        title:
+          type: string
+        total_voters:
+          type: integer
+        total_votes:
+          type: integer
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PositionResult'
+
+    # ==================== Analytics Schemas ====================
+    AnalyticsOverview:
+      type: object
+      properties:
+        total_elections:
+          type: integer
+        active_elections:
+          type: integer
+        completed_elections:
+          type: integer
+        total_voters:
+          type: integer
+        total_votes:
+          type: integer
+
+    ElectionAnalytic:
+      type: object
+      properties:
+        election_id:
+          type: integer
+        title:
+          type: string
+        status:
+          type: string
+        total_votes:
+          type: integer
+        registered_voters:
+          type: integer
+        turnout_percentage:
+          type: number
+          format: double
+
+    TurnoutAnalytic:
+      type: object
+      properties:
+        election_id:
+          type: integer
+        total_registered:
+          type: integer
+        total_voted:
+          type: integer
+        turnout_percentage:
+          type: number
+          format: double
+
+    # ==================== Error Schemas ====================
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: object
+          properties:
+            email:
+              type: array
+              items:
+                type: string
+                example: The email field is required.
+
+paths:
+  # ==================== AUTH ENDPOINTS ====================
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        201:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        422:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        422:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /auth/logout:
+    post:
+      summary: Logout user
+      tags: [Auth]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /auth/me:
+    get:
+      summary: Get authenticated user info
+      tags: [Auth]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: User information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: Unauthenticated
+
+  /auth/refresh:
+    post:
+      summary: Refresh authentication token
+      tags: [Auth]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /auth/forgot-password:
+    post:
+      summary: Send password reset link
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        200:
+          description: Reset link sent to email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /auth/reset-password:
+    post:
+      summary: Reset password with token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        200:
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        422:
+          description: Validation error
+
+  /auth/change-password:
+    post:
+      summary: Change current password
+      tags: [Auth]
+      security:
+        - sanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        200:
+          description: Password changed successfully
+        401:
+          description: Current password incorrect
+        422:
+          description: Validation error
+
+  # ==================== USERS ENDPOINTS ====================
+  /users/profile:
+    get:
+      summary: Get user profile
+      tags: [Users]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+    patch:
+      summary: Update user profile
+      tags: [Users]
+      security:
+        - sanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+      responses:
+        200:
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        422:
+          description: Validation error
+
+  /users/organizations:
+    get:
+      summary: Get user's organizations
+      tags: [Users]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: List of user's organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
+
+  # ==================== ORGANIZATIONS ENDPOINTS ====================
+  /organizations:
+    post:
+      summary: Create organization
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+      responses:
+        201:
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        422:
+          description: Validation error
+
+    get:
+      summary: List user's organizations
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: List of organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
+
+  /organizations/{id}:
+    get:
+      summary: Get organization details
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        404:
+          description: Organization not found
+        403:
+          description: Unauthorized
+
+    patch:
+      summary: Update organization
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationRequest'
+      responses:
+        200:
+          description: Organization updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        403:
+          description: Only owner/admin can update
+
+    delete:
+      summary: Delete organization
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Organization deleted
+        403:
+          description: Only owner can delete
+
+  /organizations/{id}/active:
+    post:
+      summary: Set active organization context
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Active organization set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active_organization_id:
+                    type: integer
+
+  /organizations/active:
+    get:
+      summary: Get current active organization
+      tags: [Organizations]
+      security:
+        - sanctumAuth: []
+      responses:
+        200:
+          description: Active organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        404:
+          description: No active organization set
+
+  # ==================== MEMBERS ENDPOINTS ====================
+  /organizations/{id}/members:
+    post:
+      summary: Add member to organization
+      tags: [Members]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMemberRequest'
+      responses:
+        201:
+          description: Member added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMember'
+        403:
+          description: Only owner/admin can add members
+
+    get:
+      summary: List organization members
+      tags: [Members]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationMember'
+
+  /organizations/{id}/members/{userId}:
+    patch:
+      summary: Update member role
+      tags: [Members]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberRoleRequest'
+      responses:
+        200:
+          description: Member updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMember'
+
+    delete:
+      summary: Remove member from organization
+      tags: [Members]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Member removed
+
+  # ==================== INVITES ENDPOINTS ====================
+  /organizations/{id}/invites:
+    post:
+      summary: Send organization invite
+      tags: [Invites]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteMemberRequest'
+      responses:
+        201:
+          description: Invite sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invite'
+
+    get:
+      summary: List pending invites
+      tags: [Invites]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of invites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invite'
+
+  /organizations/invites/{token}/accept:
+    post:
+      summary: Accept organization invite
+      tags: [Invites]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Invite accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  organization:
+                    $ref: '#/components/schemas/Organization'
+
+  # ==================== ELECTIONS ENDPOINTS ====================
+  /organizations/{orgId}/elections:
+    post:
+      summary: Create election
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateElectionRequest'
+      responses:
+        201:
+          description: Election created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Election'
+        403:
+          description: Insufficient permissions
+
+    get:
+      summary: List elections
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [draft, active, stopped, closed, published]
+      responses:
+        200:
+          description: List of elections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Election'
+
+  /organizations/{orgId}/elections/{id}:
+    get:
+      summary: Get election details
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Election details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectionDetail'
+
+    patch:
+      summary: Update election
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateElectionRequest'
+      responses:
+        200:
+          description: Election updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Election'
+
+    delete:
+      summary: Delete election
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Election deleted
+
+  /elections/{id}/start:
+    patch:
+      summary: Start election
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Election started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Election'
+        409:
+          description: Election cannot be started (wrong status)
+
+  /elections/{id}/stop:
+    patch:
+      summary: Stop election
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Election stopped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Election'
+
+  /elections/{id}/publish:
+    patch:
+      summary: Publish election results
+      tags: [Elections]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Results published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Election'
+
+  # ==================== POSITIONS ENDPOINTS ====================
+  /elections/{electionId}/positions:
+    post:
+      summary: Create position
+      tags: [Positions]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePositionRequest'
+      responses:
+        201:
+          description: Position created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Position'
+
+    get:
+      summary: List positions
+      tags: [Positions]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PositionWithCandidates'
+
+  /positions/{id}:
+    get:
+      summary: Get position details
+      tags: [Positions]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Position details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionWithCandidates'
+
+    patch:
+      summary: Update position
+      tags: [Positions]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePositionRequest'
+      responses:
+        200:
+          description: Position updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Position'
+
+    delete:
+      summary: Delete position
+      tags: [Positions]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Position deleted
+
+  # ==================== CANDIDATES ENDPOINTS ====================
+  /positions/{positionId}/candidates:
+    post:
+      summary: Create candidate
+      tags: [Candidates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: positionId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCandidateRequest'
+      responses:
+        201:
+          description: Candidate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+
+    get:
+      summary: List candidates
+      tags: [Candidates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: positionId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+
+  /candidates/{id}:
+    get:
+      summary: Get candidate details
+      tags: [Candidates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Candidate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+
+    patch:
+      summary: Update candidate
+      tags: [Candidates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCandidateRequest'
+      responses:
+        200:
+          description: Candidate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+
+    delete:
+      summary: Delete candidate
+      tags: [Candidates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Candidate deleted
+
+  # ==================== ELECTION ACCESS ENDPOINTS ====================
+  /elections/{electionId}/access:
+    post:
+      summary: Create voter access token
+      tags: [Access]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateElectionAccessRequest'
+      responses:
+        201:
+          description: Access created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectionAccess'
+
+    post:
+      summary: Bulk create voter access tokens
+      tags: [Access]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkElectionAccessRequest'
+      responses:
+        201:
+          description: Access tokens created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ElectionAccess'
+
+    get:
+      summary: List access tokens
+      tags: [Access]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of access tokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ElectionAccess'
+
+  /access/{id}:
+    delete:
+      summary: Revoke access token
+      tags: [Access]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Access revoked
+
+  /access/{token}/resend:
+    post:
+      summary: Resend access token to email
+      tags: [Access]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Token resent to email
+
+  # ==================== VOTING ENDPOINTS ====================
+  /vote:
+    post:
+      summary: Submit ballot
+      tags: [Voting]
+      security:
+        - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteRequest'
+      responses:
+        201:
+          description: Ballot submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteResponse'
+        409:
+          description: Token already used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        422:
+          description: Validation error
+
+  /vote/validate/{token}:
+    get:
+      summary: Validate voter token
+      tags: [Voting]
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  election:
+                    $ref: '#/components/schemas/ElectionDetail'
+        404:
+          description: Token not found or invalid
+
+  /vote/receipt/{voteId}:
+    get:
+      summary: Get vote receipt
+      tags: [Voting]
+      parameters:
+        - in: path
+          name: voteId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Vote receipt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteReceipt'
+        404:
+          description: Vote not found
+
+  # ==================== RESULTS ENDPOINTS ====================
+  /organizations/{orgId}/elections/{electionId}/results:
+    get:
+      summary: Get election results
+      tags: [Results]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Election results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectionResults'
+        403:
+          description: Results not published yet
+
+  /elections/{electionId}/results/live:
+    get:
+      summary: Get live election results
+      tags: [Results]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Live results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectionResults'
+        403:
+          description: Only election creators can view live results
+
+  /elections/{electionId}/results/export:
+    get:
+      summary: Export election results
+      tags: [Results]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [csv, pdf, json]
+            default: json
+      responses:
+        200:
+          description: Results exported
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectionResults'
+
+  # ==================== ANALYTICS ENDPOINTS ====================
+  /organizations/{orgId}/analytics/overview:
+    get:
+      summary: Get organization analytics overview
+      tags: [Analytics]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverview'
+
+  /organizations/{orgId}/analytics/elections:
+    get:
+      summary: Get elections analytics
+      tags: [Analytics]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Elections analytics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ElectionAnalytic'
+
+  /organizations/{orgId}/analytics/turnout/{electionId}:
+    get:
+      summary: Get election turnout analytics
+      tags: [Analytics]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: electionId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Turnout analytics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoutAnalytic'
+
+  /organizations/{orgId}/analytics/votes:
+    get:
+      summary: Get vote analytics
+      tags: [Analytics]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: election_id
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Vote analytics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_votes:
+                    type: integer
+                  votes_per_day:
+                    type: array
+                    items:
+                      type: object
