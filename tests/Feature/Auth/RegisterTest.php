@@ -25,20 +25,18 @@ class RegisterTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'message',
-                'data' => [
-                    'user' => [
-                        'id',
-                        'name',
-                        'email',
-                        'email_verified_at',
-                        'created_at',
-                        'updated_at',
-                    ],
-                    'token',
+                'token',
+                'user' => [
+                    'id',
+                    'name',
+                    'email',
+                    'email_verified_at',
+                    'created_at',
+                    'updated_at',
                 ],
             ])
-            ->assertJsonPath('data.user.name', 'John Doe')
-            ->assertJsonPath('data.user.email', 'john@example.com');
+            ->assertJsonPath('user.name', 'John Doe')
+            ->assertJsonPath('user.email', 'john@example.com');
 
         $this->assertDatabaseHas('users', [
             'email' => 'john@example.com',
