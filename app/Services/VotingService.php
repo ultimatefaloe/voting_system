@@ -312,7 +312,7 @@ class VotingService
         }
 
         $voteSession = $election->voteSessions()
-            ->where('voter_token_id', $voterToken->id)
+            ->where('voter_token', $voterToken->token)
             ->first();
 
         if (!$voteSession) {
