@@ -1,7 +1,7 @@
 
 const Ultimate = () => {
   return (
-    <div>Welcoemt to Ultimate Page</div>
+    <div>Welcome to Ultimate Page</div>
   )
 }
 
