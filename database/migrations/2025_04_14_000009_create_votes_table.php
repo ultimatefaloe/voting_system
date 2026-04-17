@@ -22,8 +22,8 @@ return new class extends Migration
             $table->index('vote_session_id');
             $table->index('position_id');
             $table->index('candidate_id');
-            // Prevent duplicate votes for same position in same session
-            $table->unique(['vote_session_id', 'position_id']);
+            // Prevent duplicate votes for the same candidate in the same position and session
+            $table->unique(['vote_session_id', 'position_id', 'candidate_id']);
         });
     }
 
