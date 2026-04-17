@@ -44,22 +44,18 @@ use App\Http\Controllers\SwaggerController;
 Route::prefix('auth')->group(function () {
     // Registration
     Route::post('/register', [RegisterController::class, 'register'])
-        ->name('auth.register')
-        ->withoutMiddleware('throttle');
+        ->name('auth.register');
 
     // Login
     Route::post('/login', [LoginController::class, 'login'])
-        ->name('auth.login')
-        ->withoutMiddleware('throttle');
+        ->name('auth.login');
 
     // Password Reset
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
-        ->name('auth.forgot-password')
-        ->withoutMiddleware('throttle');
+        ->name('auth.forgot-password');
 
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])
-        ->name('auth.reset-password')
-        ->withoutMiddleware('throttle');
+        ->name('auth.reset-password');
 
     // Protected auth routes
     Route::middleware('auth:sanctum')->group(function () {
