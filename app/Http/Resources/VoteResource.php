@@ -17,7 +17,7 @@ class VoteResource extends JsonResource
         return [
             'id' => $this->id,
             'candidate_id' => $this->candidate_id,
-            'voter_token' => $this->voter_token,
+            'voter_token' => $this->whenLoaded('voteSession', fn () => $this->voteSession->voter_token),
             'vote_session_id' => $this->vote_session_id,
             'created_at' => $this->created_at,
 
