@@ -14,7 +14,7 @@ class SwaggerController extends Controller
     public function spec(): JsonResponse
     {
         $spec = [
-            'openapi' => '3.1.0',
+            'openapi' => '3.0.3',
             'info' => [
                 'title' => 'Voting System API',
                 'description' => 'Complete API for managing organizations, elections, voting, and analytics',

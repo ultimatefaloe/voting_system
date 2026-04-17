@@ -1,3 +1,27 @@
+// Generic UI and API helper types
+
+export interface ApiError {
+  message?: string;
+  errors?: Record<string, string[]>;
+  status?: number;
+}
+
+export interface Paginated<T> {
+  data: T[];
+  meta: {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+  };
+}
+
+export interface Option<T = string> {
+  label: string;
+  value: T;
+}
+
+export type Nullable<T> = T | null | undefined;
 import type { ReactNode } from 'react';
 import type { BreadcrumbItem } from '@/types/navigation';
 
