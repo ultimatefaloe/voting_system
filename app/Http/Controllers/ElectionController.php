@@ -42,7 +42,7 @@ class ElectionController extends Controller
      */
     public function store(StoreElectionRequest $request, Organization $organization): JsonResponse
     {
-        $this->authorize('create', [Election::class, $organization]);
+        $this->authorize('create', Election::class);
 
         try {
             $election = $organization->elections()->create([
