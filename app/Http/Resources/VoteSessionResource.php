@@ -17,14 +17,10 @@ class VoteSessionResource extends JsonResource
         return [
             'id' => $this->id,
             'voter_token' => $this->voter_token,
-            'election_access_id' => $this->election_access_id,
             'ip_address' => $this->ip_address,
             'user_agent' => $this->user_agent,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            // Include relationships when loaded
-            'election_access' => new ElectionAccessResource($this->whenLoaded('electionAccess')),
         ];
     }
 }
