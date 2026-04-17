@@ -199,8 +199,9 @@ class InviteController extends Controller
                 ], 410);
             }
 
-            // Mark invite as rejected
-            $invite->update(['status' => 'rejected']);
+            // Model rejection by removing the pending invite instead of
+            // writing an unsupported enum value to the status column.
+            $invite->delete();
 
             return response()->json([
                 'message' => 'Invitation rejected successfully',
