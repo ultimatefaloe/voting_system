@@ -43,15 +43,15 @@ use App\Http\Controllers\SwaggerController;
 // ============================================================================
 Route::prefix('auth')->group(function () {
     // Registration
-    Route::post('/register', [RegisterController::class, 'register'])
+    Route::post('/register', [RegisterController::class, 'store'])
         ->name('auth.register');
 
     // Login
-    Route::post('/login', [LoginController::class, 'login'])
+    Route::post('/login', [LoginController::class, 'store'])
         ->name('auth.login');
 
     // Password Reset
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendLink'])
         ->name('auth.forgot-password');
 
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])
@@ -64,15 +64,15 @@ Route::prefix('auth')->group(function () {
             ->name('auth.me');
 
         // Refresh token
-        Route::post('/refresh', [RefreshController::class, 'refresh'])
+        Route::post('/refresh', [RefreshController::class, 'store'])
             ->name('auth.refresh');
 
         // Change password
-        Route::post('/change-password', [ChangePasswordController::class, 'change'])
+        Route::post('/change-password', [ChangePasswordController::class, 'store'])
             ->name('auth.change-password');
 
         // Logout
-        Route::post('/logout', [LogoutController::class, 'logout'])
+        Route::post('/logout', [LogoutController::class, 'destroy'])
             ->name('auth.logout');
     });
 });
