@@ -11,9 +11,11 @@ use App\Policies\ElectionPolicy;
 use App\Policies\OrganizationPolicy;
 use App\Policies\PositionPolicy;
 use Carbon\CarbonImmutable;
+use Dedoc\Scramble\Scramble;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -34,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configurePolicies();
         $this->configureDefaults();
+        $this->configureScramble();
     }
 
     /**
@@ -67,5 +70,33 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    /**
+     * Configure Scramble to document API and web routes.
+     */
+    protected function configureScramble(): void
+    {
+        if (! class_exists(Scramble::class)) {
+            return;
+        }
+
+        Scramble::routes(function () {
+            return collect(Route::getRoutes())
+                ->filter(function ($route) {
+                    $uri = $route->uri();
+                    $action = $route->getAction('uses');
+
+                    if (! is_string($action) || $action === 'Closure') {
+                        return false;
+                    }
+
+                    return ! str_starts_with($uri, 'docs')
+                        && ! str_starts_with($uri, 'api/docs')
+                        && ! str_starts_with($uri, '_ignition')
+                        && ! str_starts_with($uri, 'sanctum');
+                })
+                ->values();
+        });
     }
 }

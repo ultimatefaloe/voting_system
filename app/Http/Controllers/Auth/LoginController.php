@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Hash;
 class LoginController extends Controller
 {
     /**
-     * Handle login request and return API token
+     * Authenticate a user and issue an access token.
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
      */
     public function store(LoginRequest $request): JsonResponse
     {
