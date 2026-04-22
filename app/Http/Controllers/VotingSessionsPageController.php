@@ -50,7 +50,9 @@ class VotingSessionsPageController extends Controller
                 'items' => $sessions,
                 'summary' => [
                     'total_sessions' => (clone $sessionsBase)->count(),
-                    'total_votes_cast' => (clone $sessionsBase)->withCount('votes')->get()->sum('votes_count'),
+                    'total_votes_cast' => (clone $sessionsBase)
+                        ->leftJoin('votes', 'vote_sessions.id', '=', 'votes.vote_session_id')
+                        ->count('votes.id'),
                     'elections_with_activity' => (clone $sessionsBase)->distinct('election_id')->count('election_id'),
                 ],
             ],
