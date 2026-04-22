@@ -1,0 +1,58 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset="1" stop-color="#0B3B5A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <rect x="120" y="90" width="960" height="620" rx="30" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+  <text x="170" y="165" fill="#E2E8F0" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">Candidate & Position Management</text>
+
+  <rect x="170" y="215" width="280" height="430" rx="20" fill="#0B1220" stroke="#334155"/>
+  <text x="200" y="262" fill="#67E8F9" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">Positions</text>
+  <rect x="200" y="290" width="220" height="60" rx="12" fill="#111827" stroke="#334155"/>
+  <rect x="200" y="365" width="220" height="60" rx="12" fill="#111827" stroke="#334155"/>
+  <rect x="200" y="440" width="220" height="60" rx="12" fill="#111827" stroke="#334155"/>
+  <rect x="200" y="515" width="220" height="60" rx="12" fill="#111827" stroke="#334155"/>
+  <text x="220" y="328" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="18">President</text>
+  <text x="220" y="403" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="18">Secretary</text>
+  <text x="220" y="478" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="18">Treasurer</text>
+  <text x="220" y="553" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="18">Auditor</text>
+
+  <rect x="500" y="215" width="530" height="430" rx="20" fill="#0B1220" stroke="#334155"/>
+  <text x="540" y="262" fill="#22D3EE" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">Candidates by Position</text>
+
+  <g>
+    <rect x="540" y="300" width="220" height="140" rx="16" fill="#111827" stroke="#334155"/>
+    <circle cx="590" cy="355" r="26" fill="#1F2937" stroke="#475569"/>
+    <rect x="630" y="338" width="105" height="12" rx="6" fill="#67E8F9"/>
+    <rect x="630" y="360" width="88" height="10" rx="5" fill="#94A3B8"/>
+    <rect x="630" y="378" width="72" height="10" rx="5" fill="#94A3B8"/>
+  </g>
+
+  <g>
+    <rect x="785" y="300" width="220" height="140" rx="16" fill="#111827" stroke="#334155"/>
+    <circle cx="835" cy="355" r="26" fill="#1F2937" stroke="#475569"/>
+    <rect x="875" y="338" width="105" height="12" rx="6" fill="#22D3EE"/>
+    <rect x="875" y="360" width="88" height="10" rx="5" fill="#94A3B8"/>
+    <rect x="875" y="378" width="72" height="10" rx="5" fill="#94A3B8"/>
+  </g>
+
+  <g>
+    <rect x="540" y="465" width="220" height="140" rx="16" fill="#111827" stroke="#334155"/>
+    <circle cx="590" cy="520" r="26" fill="#1F2937" stroke="#475569"/>
+    <rect x="630" y="503" width="105" height="12" rx="6" fill="#38BDF8"/>
+    <rect x="630" y="525" width="88" height="10" rx="5" fill="#94A3B8"/>
+    <rect x="630" y="543" width="72" height="10" rx="5" fill="#94A3B8"/>
+  </g>
+
+  <g>
+    <rect x="785" y="465" width="220" height="140" rx="16" fill="#111827" stroke="#334155"/>
+    <circle cx="835" cy="520" r="26" fill="#1F2937" stroke="#475569"/>
+    <rect x="875" y="503" width="105" height="12" rx="6" fill="#06B6D4"/>
+    <rect x="875" y="525" width="88" height="10" rx="5" fill="#94A3B8"/>
+    <rect x="875" y="543" width="72" height="10" rx="5" fill="#94A3B8"/>
+  </g>
+</svg>

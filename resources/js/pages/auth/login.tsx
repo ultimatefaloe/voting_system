@@ -84,7 +84,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="brand-cta mt-4 w-full border-0"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -95,9 +95,13 @@ export default function Login({
                         </div>
 
                         {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
+                            <div className="text-center text-sm text-slate-300">
                                 Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
+                                <TextLink
+                                    href={register()}
+                                    tabIndex={5}
+                                    className="text-cyan-300 hover:text-cyan-200"
+                                >
                                     Sign up
                                 </TextLink>
                             </div>
@@ -107,7 +111,7 @@ export default function Login({
             </Form>
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mb-4 text-center text-sm font-medium text-emerald-300">
                     {status}
                 </div>
             )}

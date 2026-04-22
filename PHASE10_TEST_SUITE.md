@@ -2,9 +2,34 @@
 
 **Project**: Voting System Platform  
 **Phase**: 10 - Testing & QA  
-**Status**: ⏳ IN PROGRESS (Test Infrastructure Created)  
+**Status**: ⏳ IN PROGRESS (Test Infrastructure Created; Execution Blocked Locally)  
 **Date Started**: 2025  
 **Overall Project Progress**: 85% (9 of 10 phases, Phase 10 in progress)  
+
+---
+
+## ⚠️ Current Local Blocker (April 2026)
+
+- Full test execution is currently blocked in this local environment.
+- Root cause:
+    - local test tooling/runtime is not currently aligned with the project's Composer-supported PHP 8.2 baseline
+    - local CLI runtime is PHP 8.2.x, but the local test setup/lock state needs to be reconciled with the documented project constraints before a full run
+- Impact:
+    - tests are authored and organized, but cannot be run to completion until the local environment and dependencies are brought back into alignment with the project's PHP 8.2-compatible setup
+
+---
+
+## ✅ Remaining Agenda to Close Phase 10
+
+1. Align the local PHP CLI/dependency setup with the project's Composer-supported PHP 8.2 configuration and re-run the full test suite.
+2. Fix any failing tests/regressions uncovered by first full run.
+3. Execute one end-to-end QA pass on key workflows:
+     - auth
+     - organizations/members/invites
+     - elections lifecycle and ballot structure
+     - voting and results publication
+4. Capture final test evidence (pass summary) and update status docs.
+5. Mark Phase 10 complete.
 
 ---
 
@@ -333,6 +358,8 @@ Examples:
 ### To Run the Tests
 
 ```bash
+# Requires PHP 8.3+ with current lockfile
+
 # Run all tests
 php artisan test
 

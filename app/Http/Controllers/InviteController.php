@@ -302,4 +302,16 @@ class InviteController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Route-compatible alias for cancelling an invitation.
+     *
+     * @param Organization $organization
+     * @param int $inviteId
+     * @return JsonResponse
+     */
+    public function destroy(Organization $organization, int $inviteId): JsonResponse
+    {
+        return $this->cancel($organization, $inviteId);
+    }
 }

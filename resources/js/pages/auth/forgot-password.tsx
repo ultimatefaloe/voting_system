@@ -15,7 +15,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             <Head title="Forgot password" />
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mb-4 text-center text-sm font-medium text-emerald-300">
                     {status}
                 </div>
             )}
@@ -40,7 +40,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                             <div className="my-6 flex items-center justify-start">
                                 <Button
-                                    className="w-full"
+                                    className="brand-cta w-full border-0"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >
@@ -54,9 +54,14 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     )}
                 </Form>
 
-                <div className="space-x-1 text-center text-sm text-muted-foreground">
+                <div className="space-x-1 text-center text-sm text-slate-300">
                     <span>Or, return to</span>
-                    <TextLink href={login()}>log in</TextLink>
+                    <TextLink
+                        href={login()}
+                        className="text-cyan-300 hover:text-cyan-200"
+                    >
+                        log in
+                    </TextLink>
                 </div>
             </div>
         </>
