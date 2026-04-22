@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Import Controllers
@@ -21,7 +20,7 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Middleware\TokenAuthMiddleware;
-use App\Http\Controllers\SwaggerController;
+use App\Http\Controllers\HealthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -355,30 +354,8 @@ Route::prefix('elections')->group(function () {
 // ============================================================================
 // Health Check & Status Routes
 // ============================================================================
-Route::get('/health', function (Request $request) {
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'API is running',
-        'timestamp' => now()->toIso8601String(),
-    ]);
-})->name('health');
-
-// ============================================================================
-// Swagger Documentation Routes
-// ============================================================================
-Route::prefix('docs')->group(function () {
-    // Get OpenAPI specification (JSON)
-    Route::get('/spec', [SwaggerController::class, 'spec'])
-        ->name('swagger.spec');
-
-    // Get Swagger UI (interactive documentation)
-    Route::get('/', [SwaggerController::class, 'ui'])
-        ->name('swagger.ui');
-
-    // Get API documentation (HTML)
-    Route::get('/api', [SwaggerController::class, 'docs'])
-        ->name('swagger.docs');
-});
+Route::get('/health', [HealthController::class, 'show'])
+    ->name('health');
 
 // Fallback for undefined routes
 Route::fallback(function () {
