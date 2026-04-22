@@ -35,9 +35,9 @@ OVERALL  [██████████████░░░░░░] 90% ⏳ 
 - Frontend quality gate is currently green:
    - `npm run lint:check` ✅
    - `npm run types:check` ✅
-- Backend test execution is currently blocked locally by PHP runtime mismatch:
-   - lockfile/test stack requires PHP 8.3+
-   - local CLI runtime is PHP 8.2.x
+- Backend test execution is currently blocked locally by PHP environment mismatch:
+   - project Composer requirement/platform is PHP `^8.2`
+   - local CLI/test environment still needs to be aligned for backend test execution
 
 ---
 
