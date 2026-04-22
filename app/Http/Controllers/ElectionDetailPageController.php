@@ -31,7 +31,7 @@ class ElectionDetailPageController extends Controller
                     'title' => $position->title,
                     'description' => $position->description,
                     'max_votes' => $position->max_votes,
-                    'candidates_count' => $position->candidates()->count(),
+                    'candidates_count' => $position->candidates->count(),
                     'candidates' => $position->candidates
                         ->sortBy('order')
                         ->map(function ($candidate) {
