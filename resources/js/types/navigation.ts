@@ -1,3 +1,5 @@
+import type { InertiaLinkProps } from '@inertiajs/react';
+import type { LucideIcon } from 'lucide-react';
 import type { User } from './auth';
 
 // Organization shapes
@@ -131,8 +133,6 @@ export interface Vote {
 
 // Convenience types used for navigation lists
 export type OrganizationSummary = Pick<Organization, 'id' | 'name' | 'slug' | 'owner_id'>;
-import type { InertiaLinkProps } from '@inertiajs/react';
-import type { LucideIcon } from 'lucide-react';
 
 export type BreadcrumbItem = {
     title: string;

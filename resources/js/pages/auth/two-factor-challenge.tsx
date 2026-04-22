@@ -105,17 +105,17 @@ export default function TwoFactorChallenge() {
 
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className="brand-cta w-full border-0"
                                 disabled={processing}
                             >
                                 Continue
                             </Button>
 
-                            <div className="text-center text-sm text-muted-foreground">
+                            <div className="text-center text-sm text-slate-300">
                                 <span>or you can </span>
                                 <button
                                     type="button"
-                                    className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                    className="cursor-pointer text-cyan-300 underline decoration-cyan-500/50 underline-offset-4 transition-colors duration-300 ease-out hover:text-cyan-200 hover:decoration-cyan-300"
                                     onClick={() =>
                                         toggleRecoveryMode(clearErrors)
                                     }

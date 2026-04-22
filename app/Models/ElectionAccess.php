@@ -12,6 +12,8 @@ class ElectionAccess extends Model
 {
     use HasFactory;
 
+    protected $table = 'election_access';
+
     const STATUS_ACTIVE = 'active';
     const STATUS_USED = 'used';
 

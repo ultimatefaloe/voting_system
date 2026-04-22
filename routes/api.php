@@ -175,6 +175,14 @@ Route::middleware('auth:sanctum')->group(function () {
                     Route::patch('/', [ElectionController::class, 'update'])
                         ->name('elections.update');
 
+                    // Start election
+                    Route::post('/start', [ElectionController::class, 'start'])
+                        ->name('elections.start');
+
+                    // Stop election
+                    Route::post('/stop', [ElectionController::class, 'stop'])
+                        ->name('elections.stop');
+
                     // Publish election
                     Route::post('/publish', [ElectionController::class, 'publish'])
                         ->name('elections.publish');

@@ -31,8 +31,9 @@ class TokenAuthMiddleware
             ], 401);
         }
 
-        // Attach access record to request for use in controller
+        // Attach access record using both keys for backward compatibility
         $request->attributes->set('voter_access', $access);
+        $request->attributes->set('voter_token', $access);
         return $next($request);
     }
 }

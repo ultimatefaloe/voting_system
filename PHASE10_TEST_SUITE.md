@@ -2,9 +2,34 @@
 
 **Project**: Voting System Platform  
 **Phase**: 10 - Testing & QA  
-**Status**: ⏳ IN PROGRESS (Test Infrastructure Created)  
+**Status**: ⏳ IN PROGRESS (Test Infrastructure Created; Execution Blocked Locally)  
 **Date Started**: 2025  
 **Overall Project Progress**: 85% (9 of 10 phases, Phase 10 in progress)  
+
+---
+
+## ⚠️ Current Local Blocker (April 2026)
+
+- Full test execution is currently blocked in this local environment.
+- Root cause:
+    - current lockfile uses Pest 4 / PHPUnit 12 ecosystem requiring PHP 8.3+
+    - local CLI runtime is PHP 8.2.x
+- Impact:
+    - tests are authored and organized, but cannot be run to completion until runtime is upgraded (or dependencies are downgraded for a separate compatibility branch)
+
+---
+
+## ✅ Remaining Agenda to Close Phase 10
+
+1. Switch local PHP CLI to 8.3+ and re-run full test suite.
+2. Fix any failing tests/regressions uncovered by first full run.
+3. Execute one end-to-end QA pass on key workflows:
+     - auth
+     - organizations/members/invites
+     - elections lifecycle and ballot structure
+     - voting and results publication
+4. Capture final test evidence (pass summary) and update status docs.
+5. Mark Phase 10 complete.
 
 ---
 
@@ -333,6 +358,8 @@ Examples:
 ### To Run the Tests
 
 ```bash
+# Requires PHP 8.3+ with current lockfile
+
 # Run all tests
 php artisan test
 

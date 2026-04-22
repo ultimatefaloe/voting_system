@@ -256,4 +256,40 @@ class ElectionController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Close an election.
+     *
+     * @param Organization $organization
+     * @param Election $election
+     * @return JsonResponse
+     */
+    public function close(Organization $organization, Election $election): JsonResponse
+    {
+        $this->authorize('stop', $election);
+
+        try {
+            if (!in_array($election->status, ['active', 'stopped'])) {
+                return response()->json([
+                    'message' => 'Election cannot be closed. Must be active or stopped.',
+                ], 400);
+            }
+
+            $election->update(['status' => 'closed']);
+
+            return response()->json([
+                'message' => 'Election closed successfully',
+                'data' => [
+                    'id' => $election->id,
+                    'title' => $election->title,
+                    'status' => $election->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to close election',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
