@@ -12,16 +12,16 @@
 
 - Full test execution is currently blocked in this local environment.
 - Root cause:
-    - current lockfile uses Pest 4 / PHPUnit 12 ecosystem requiring PHP 8.3+
-    - local CLI runtime is PHP 8.2.x
+    - local test tooling/runtime is not currently aligned with the project's Composer-supported PHP 8.2 baseline
+    - local CLI runtime is PHP 8.2.x, but the local test setup/lock state needs to be reconciled with the documented project constraints before a full run
 - Impact:
-    - tests are authored and organized, but cannot be run to completion until runtime is upgraded (or dependencies are downgraded for a separate compatibility branch)
+    - tests are authored and organized, but cannot be run to completion until the local environment and dependencies are brought back into alignment with the project's PHP 8.2-compatible setup
 
 ---
 
 ## ✅ Remaining Agenda to Close Phase 10
 
-1. Switch local PHP CLI to 8.3+ and re-run full test suite.
+1. Align the local PHP CLI/dependency setup with the project's Composer-supported PHP 8.2 configuration and re-run the full test suite.
 2. Fix any failing tests/regressions uncovered by first full run.
 3. Execute one end-to-end QA pass on key workflows:
      - auth
