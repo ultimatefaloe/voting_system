@@ -12,6 +12,7 @@ use App\Http\Controllers\ResultsPageController;
 use App\Http\Controllers\VotingSessionsPageController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Dedoc\Scramble\Scramble;
 
 Route::inertia('/', 'welcome/index', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -37,5 +38,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('results/{election}', ResultDetailPageController::class)->name('app.results.show');
     Route::get('analytics', AnalyticsPageController::class)->name('app.analytics.index');
 });
+
+// ============================================================================
+// Scramble API Documentation Routes
+// ============================================================================
+// Access documentation at: /docs
+Scramble::registerUiRoute('/docs');
+
+// Access OpenAPI specification at: /api.json
+Scramble::registerJsonSpecificationRoute('/api.json');
 
 require __DIR__.'/settings.php';

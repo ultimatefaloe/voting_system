@@ -11,7 +11,10 @@ use Illuminate\Http\JsonResponse;
 class RegisterController extends Controller
 {
     /**
-     * Handle registration request
+     * Register a new user account.
+     *
+     * @param RegisterRequest $request
+     * @return JsonResponse
      */
     public function store(RegisterRequest $request): JsonResponse
     {
