@@ -1,0 +1,17 @@
+{
+  "name": "Voting System (PHP 8.3)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [],
+  "postCreateCommand": "composer install --no-interaction || true",
+  "extensions": [
+    "bmewburn.vscode-intelephense-client",
+    "esbenp.prettier-vscode"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  }
+}
